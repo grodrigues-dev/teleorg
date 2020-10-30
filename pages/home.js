@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Header from '../shared/components/Header';
+import Loader from '../shared/components/Loader';
 
 import {
     Image,
@@ -17,7 +18,8 @@ export default class Home extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            listaOrgaos: []
+            listaOrgaos: [],
+            loading: true
         }
     }
 
@@ -26,8 +28,14 @@ export default class Home extends Component {
             this.setState({
                 listaOrgaos: data
             });
+            this.setState({
+                loading: false
+            });
         }
         ).catch((e) => {
+            this.setState({
+                loading: false
+            })
             console.log(e);
         })
     }
@@ -71,6 +79,7 @@ export default class Home extends Component {
                         </TouchableHighlight>
                     </View>
                 </View>
+                <Loader showModal={this.state.loading}/>
             </View>
         )
     }
