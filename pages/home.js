@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import Header from '../shared/components/Header';
 import Loader from '../shared/components/Loader';
+import ListaEntregas from '../shared/components/ListaEntregas';
 
 import {
     Image,
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
@@ -18,15 +20,16 @@ export default class Home extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            listaOrgaos: [],
-            loading: true
+            listaEntregas: [],
+            loading: true,
+            paginaBusca: 1
         }
     }
 
     componentDidMount() {
-        getOrgaos().then((data) => {
+        getOrgaos(this.state.paginaBusca).then((data) => {
             this.setState({
-                listaOrgaos: data
+                listaEntregas: data
             });
             this.setState({
                 loading: false
@@ -78,8 +81,12 @@ export default class Home extends Component {
                             </React.Fragment>
                         </TouchableHighlight>
                     </View>
+                    {
+                        !this.state.loading &&
+                        <ListaEntregas entrega={this.state.listaEntregas[0]} />
+                    }
                 </View>
-                <Loader showModal={this.state.loading}/>
+                <Loader showModal={this.state.loading} />
             </View>
         )
     }
