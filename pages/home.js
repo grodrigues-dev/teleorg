@@ -5,7 +5,6 @@ import ListaEntregas from '../shared/components/ListaEntregas';
 
 import {
     Image,
-    ScrollView,
     StyleSheet,
     Text,
     TextInput,
@@ -13,7 +12,11 @@ import {
     View,
 } from 'react-native';
 
+import AsyncStorage from '@react-native-community/async-storage';
+
 import { getOrgaos } from '../shared/services/api';
+
+const token = AsyncStorage.getItem('token')
 
 export default class Home extends Component {
 
@@ -22,12 +25,12 @@ export default class Home extends Component {
         this.state = {
             listaEntregas: [],
             loading: true,
-            paginaBusca: 1
+            paginaBusca: 6, 
         }
     }
 
     componentDidMount() {
-        getOrgaos(this.state.paginaBusca).then((data) => {
+        getOrgaos(this.state.paginaBusca, token['_W']).then((data) => {
             this.setState({
                 listaEntregas: data
             });
@@ -35,11 +38,11 @@ export default class Home extends Component {
                 loading: false
             });
         }
-        ).catch((e) => {
+        ).catch(() => {
             this.setState({
                 loading: false
-            })
-            console.log(e);
+            });
+            alert('Erro ao consultar as entregas')
         })
     }
 

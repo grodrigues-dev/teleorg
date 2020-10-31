@@ -19,7 +19,6 @@ export default class Loader extends Component {
     }
 
     componentDidMount() {
-        console.log(this.props);
         this.setState(this.props.entrega)
     }
 
