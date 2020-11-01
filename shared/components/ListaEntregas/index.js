@@ -67,18 +67,44 @@ export default class Loader extends Component {
         this.setState({
             status: this.getStatus(this.state.listaEntregas[proximoRegistro].statusEntrega)
         });
-        console.log(this.state.status);
     }
-
 
     render() {
         return (
             <View style={styles.container}>
-                <View style={[styles.entregaContainer, { backgroundColor: this.state.status.background }]}>
-                    <Text>Status: {this.state.status.status}</Text>
-                    <Text>Previsão de entrega: {this.getPrevisao(this.state.entrega.previsaoEntrega)}</Text>
-                    <Text>Tempo Estimado</Text>
-                </View>
+                {
+                    (this.state.entrega.statusEntrega === 'EM_PREPARACAO' || this.state.entrega.statusEntrega === 'EM_ROTA') &&
+                    <View style={[styles.entregaContainer, { backgroundColor: this.state.status.background }]}>
+                        <Text>cod. entrega: {this.state.entrega.id}</Text>
+                        <Text>Status: {this.state.status.status}</Text>
+                        <Text>Orgão solicitado: {this.state.entrega.doacao.orgao.tipoOrgao}</Text>
+                        <Text>Previsão de entrega: {this.getPrevisao(this.state.entrega.previsaoEntrega)}</Text>
+                        <Text>Paciente Destinatário: {this.state.entrega.doacao.receptor.nome}</Text>
+                        <Text>Endereço de entrega: {
+                            `${this.state.entrega.doacao.orgao.doador.hospital.nome} ${this.state.entrega.doacao.orgao.doador.hospital.logradouro} ${this.state.entrega.doacao.orgao.doador.hospital.cidade}`}</Text>
+                        <Text>Endereço de destino: {
+                            `${this.state.entrega.doacao.receptor.hospital.nome} ${this.state.entrega.doacao.receptor.hospital.logradouro} ${this.state.entrega.doacao.receptor.hospital.cidade}`} </Text>
+                    </View>
+                }
+                {
+                    this.state.entrega.statusEntrega === 'CANCELADO' &&
+                    <View style={[styles.entregaContainer, { backgroundColor: this.state.status.background }]}>
+                        <Text>cod. entrega: {this.state.entrega.id}</Text>
+                        <Text>Status: {this.state.status.status}</Text>
+                        <Text>A entrega solcitada foi cancelada, em breve uma nova entrega será gerada para o endereço solicitado</Text>
+                    </View>
+                }
+                {
+                    this.state.entrega.statusEntrega === 'ENTREGUE' &&
+                    <View style={[styles.entregaContainer, { backgroundColor: this.state.status.background }]}>
+                        <Text>cod. entrega: {this.state.entrega.id}</Text>
+                        <Text>Orgão solicitado: {this.state.entrega.doacao.orgao.tipoOrgao}</Text>
+                        <Text>Status: {this.state.status.status}</Text>
+                        <Text>A entrega foi realizada com sucesso!</Text>
+                        <Text>Nome do paciente: {this.state.entrega.doacao.receptor.nome}</Text>
+                        <Text>Data entrega: {this.getPrevisao(this.state.entrega.dataHoraEntrega)}</Text>
+                    </View>
+                }
                 <View style={styles.containerPaginacao}>
                     <TouchableOpacity
                         style={this.state.registroAtual === 0 ? styles.botoesPaginacaoDisabled : styles.botoesPaginacao}
@@ -86,7 +112,6 @@ export default class Loader extends Component {
                         onPress={() => this.navegarEntreRegistros(-1)}>
                         <Text style={styles.textoBotesPaginacao}>Anterior</Text>
                     </TouchableOpacity>
-                    <Text>Pg. {this.state.paginaBusca}</Text>
                     <TouchableOpacity
                         onPress={() => this.navegarEntreRegistros(1)}
                         style={this.state.registroAtual === 4 ? styles.botoesPaginacaoDisabled : styles.botoesPaginacao}
@@ -104,18 +129,21 @@ export default class Loader extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 20,
-        marginBottom: 20
+        marginTop: 10,
+        marginBottom: 10
     },
     entregaContainer: {
         marginTop: 10,
         padding: 10,
+        height: 180,
+        borderRadius: 10,
+        justifyContent: 'center'
     },
     containerPaginacao: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',
-        marginTop: 50,
+        marginTop: 30,
 
     },
     botoesPaginacao: {
