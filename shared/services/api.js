@@ -2,12 +2,12 @@ import axios from 'axios';
 
 const BASE_URL = 'http://teleorgapi.azurewebsites.net/api/'
 
-export function getOrgaos(page, token) {
-    return axios.get(`${BASE_URL}entrega/${page}`, {
+export function getOrgaos(token) {
+    return axios.get(`${BASE_URL}entrega/findAll`, {
         headers: {
             Authorization: token
         }
-    }).then(({data})=> data.content).catch((e)=> e);
+    }).then(({data})=> data).catch((e)=> e);
 }
 
 export function realizarLogin(body) {

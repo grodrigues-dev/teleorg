@@ -17,7 +17,7 @@ export default class Loader extends Component {
             listaEntregas: this.props.entrega,
             entrega: this.props.entrega[0],
             registroAtual: 0,
-            registrosPorPagina: 5,
+            registrosPorPagina: this.props.entrega.length,
             status: this.getStatus(this.props.entrega[0].statusEntrega)
         }
     }
@@ -114,8 +114,9 @@ export default class Loader extends Component {
                     </TouchableOpacity>
                     <TouchableOpacity
                         onPress={() => this.navegarEntreRegistros(1)}
-                        style={this.state.registroAtual === 4 ? styles.botoesPaginacaoDisabled : styles.botoesPaginacao}
-                        disabled={this.state.registroAtual === 4}>
+                        style={this.state.registroAtual === this.state.listaEntregas.length -1 ? styles.botoesPaginacaoDisabled : styles.botoesPaginacao }
+                        disabled={this.state.registroAtual === this.state.listaEntregas.length -1 }
+                        >
                         <Text
                             style={styles.textoBotesPaginacao}>Próxima</Text>
                     </TouchableOpacity>

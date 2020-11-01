@@ -25,13 +25,13 @@ export default class Home extends Component {
         this.state = {
             listaEntregas: [],
             loading: true,
-            paginaBusca: 2,
         }
 
     }
 
     componentDidMount() {
-        getOrgaos(this.state.paginaBusca, token['_W']).then((data) => {
+        getOrgaos(token['_W']).then((data) => {
+
             this.setState({
                 listaEntregas: data
             });
