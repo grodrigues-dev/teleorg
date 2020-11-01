@@ -25,8 +25,9 @@ export default class Home extends Component {
         this.state = {
             listaEntregas: [],
             loading: true,
-            paginaBusca: 6, 
+            paginaBusca: 2,
         }
+
     }
 
     componentDidMount() {
@@ -71,7 +72,8 @@ export default class Home extends Component {
                         </View>
                     </View>
                     <View style={styles.containerBotoes}>
-                        <TouchableHighlight style={styles.btnFiltro}>
+                        <TouchableHighlight
+                            style={styles.btnFiltro}>
                             <React.Fragment>
                                 <Text style={styles.textoBotao}>Filtro</Text>
                                 <Image style={styles.icoBotao} source={require('../assets/filtro.png')} />
@@ -84,9 +86,11 @@ export default class Home extends Component {
                             </React.Fragment>
                         </TouchableHighlight>
                     </View>
+                </View>
+                <View style={styles.containerMain}>
                     {
                         !this.state.loading &&
-                        <ListaEntregas entrega={this.state.listaEntregas[0]} />
+                        <ListaEntregas entrega={this.state.listaEntregas} />
                     }
                 </View>
                 <Loader showModal={this.state.loading} />
@@ -95,6 +99,8 @@ export default class Home extends Component {
     }
 
 }
+
+
 
 
 const styles = StyleSheet.create({
@@ -107,9 +113,12 @@ const styles = StyleSheet.create({
         padding: 20,
         height: 150,
     },
+    containerMain: {
+        marginTop: 200, 
+        padding: 20
+    },
     pesquisa: {
         backgroundColor: '#fff',
-        height: 290,
         width: 380,
         borderRadius: 5,
         display: 'flex',
@@ -200,6 +209,6 @@ const styles = StyleSheet.create({
     icoBotao: {
         width: 25,
         height: 20
-    }
+    },
 })
 
