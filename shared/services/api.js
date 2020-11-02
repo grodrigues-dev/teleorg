@@ -10,6 +10,14 @@ export function getOrgaos(token) {
     }).then(({data})=> data).catch((e)=> e);
 }
 
+export function getEntregaPorId(token, id) {
+    return axios.get(`${BASE_URL}entrega/findById/${id}`, {
+        headers: {
+            Authorization: token
+        }
+    }).then(({data})=> data).catch((e)=> e);
+}
+
 export function realizarLogin(body) {
     return axios.post(`${BASE_URL}usuarios/auth`, body).then(({data})=> data).catch(e => e);
 }

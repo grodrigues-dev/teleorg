@@ -7,8 +7,7 @@ import {
     View
 } from 'react-native';
 
-import moment from 'moment';
-
+import { getPrevisao, getStatus} from '../../util';
 
 export default class Loader extends Component {
     constructor(props) {
@@ -18,44 +17,10 @@ export default class Loader extends Component {
             entrega: this.props.entrega[0],
             registroAtual: 0,
             registrosPorPagina: this.props.entrega.length,
-            status: this.getStatus(this.props.entrega[0].statusEntrega)
+            status: getStatus(this.props.entrega[0].statusEntrega)
         }
     }
 
-    getPrevisao = (data) => {
-        return moment(data).format('DD/MM/YYYY hh:mm');
-    }
-
-    getStatus = (entrega) => {
-        let status;
-        switch (entrega) {
-            case 'EM_PREPARACAO':
-                status = {
-                    status: 'Em preparação',
-                    background: '#DCE1F2'
-                }
-                break;
-            case 'EM_ROTA':
-                status = {
-                    status: 'Em rota',
-                    background: '#FFF080'
-                }
-                break;
-            case 'ENTREGUE':
-                status = {
-                    status: 'Entregue',
-                    background: '#E7F5E6'
-                }
-                break;
-            case 'CANCELADO':
-                status = {
-                    status: 'Cancelado',
-                    background: '#E8C7C5'
-                }
-                break;
-        }
-        return status;
-    }
 
 
     navegarEntreRegistros = (direcao) => {
@@ -65,7 +30,7 @@ export default class Loader extends Component {
             registroAtual: proximoRegistro
         });
         this.setState({
-            status: this.getStatus(this.state.listaEntregas[proximoRegistro].statusEntrega)
+            status: getStatus(this.state.listaEntregas[proximoRegistro].statusEntrega)
         });
     }
 
@@ -78,7 +43,7 @@ export default class Loader extends Component {
                         <Text>cod. entrega: {this.state.entrega.id}</Text>
                         <Text>Status: {this.state.status.status}</Text>
                         <Text>Orgão solicitado: {this.state.entrega.doacao.orgao.tipoOrgao}</Text>
-                        <Text>Previsão de entrega: {this.getPrevisao(this.state.entrega.previsaoEntrega)}</Text>
+                        <Text>Previsão de entrega: {getPrevisao(this.state.entrega.previsaoEntrega)}</Text>
                         <Text>Paciente Destinatário: {this.state.entrega.doacao.receptor.nome}</Text>
                         <Text>Endereço de entrega: {
                             `${this.state.entrega.doacao.orgao.doador.hospital.nome} ${this.state.entrega.doacao.orgao.doador.hospital.logradouro} ${this.state.entrega.doacao.orgao.doador.hospital.cidade}`}</Text>
@@ -102,7 +67,7 @@ export default class Loader extends Component {
                         <Text>Status: {this.state.status.status}</Text>
                         <Text>A entrega foi realizada com sucesso!</Text>
                         <Text>Nome do paciente: {this.state.entrega.doacao.receptor.nome}</Text>
-                        <Text>Data entrega: {this.getPrevisao(this.state.entrega.dataHoraEntrega)}</Text>
+                        <Text>Data entrega: {getPrevisao(this.state.entrega.dataHoraEntrega)}</Text>
                     </View>
                 }
                 <View style={styles.containerPaginacao}>

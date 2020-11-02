@@ -5,6 +5,7 @@ import ListaEntregas from '../shared/components/ListaEntregas';
 
 import {
     Image,
+    Modal,
     StyleSheet,
     Text,
     TextInput,
@@ -14,7 +15,10 @@ import {
 
 import AsyncStorage from '@react-native-community/async-storage';
 
-import { getOrgaos } from '../shared/services/api';
+import { getOrgaos, getEntregaPorId } from '../shared/services/api';
+
+import { getPrevisao, getStatus } from '../shared/util';
+
 
 const token = AsyncStorage.getItem('token')
 
@@ -25,26 +29,56 @@ export default class Home extends Component {
         this.state = {
             listaEntregas: [],
             loading: true,
+            showModalFindOne: false,
+            idEntrega: '',
+            entrega: {},
+            status: {
+
+            }
         }
 
     }
 
     componentDidMount() {
         getOrgaos(token['_W']).then((data) => {
-
             this.setState({
-                listaEntregas: data
-            });
-            this.setState({
+                listaEntregas: data,
                 loading: false
             });
-        }
-        ).catch(() => {
+        }).catch(() => {
             this.setState({
                 loading: false
             });
             alert('Erro ao consultar as entregas')
         })
+    }
+
+    closeModal = () => {
+        this.setState({
+            showModalFindOne: false
+        })
+    }
+
+    consultarEntrega = () => {
+        this.setState({ loading: true });
+        getEntregaPorId(token['_W'], this.state.idEntrega).then(data => {
+            if (!data.id) {
+                this.setState({ loading: false })
+                return alert('entrega nao encontrada');
+            }
+            this.setState({
+                loading: false,
+                entrega: data,
+                showModalFindOne: true,
+                status: getStatus(data.statusEntrega)
+            });
+        }).catch(() => {
+            this.setState({
+                loading: false
+            });
+            alert('Erro ao consulta entregas')
+        })
+
     }
 
     render() {
@@ -59,8 +93,16 @@ export default class Home extends Component {
                         <View style={styles.containerInput}>
                             <View style={styles.backgroundInput}>
                                 <TextInput
-                                    style={styles.textInput} />
-                                <Image style={styles.icon} source={require('../assets/lupa.png')} />
+                                    style={styles.textInput}
+                                    onChangeText={e => this.setState({ idEntrega: e })}
+                                    keyboardType={'numeric'}
+                                    placeholder="DIGTE O ID DA ENTREGA"
+                                />
+                                <TouchableHighlight
+                                    disabled={!this.state.idEntrega}
+                                    onPress={this.consultarEntrega}>
+                                    <Image style={styles.icon} source={require('../assets/lupa.png')} />
+                                </TouchableHighlight>
                             </View>
                         </View>
                         <View style={styles.linha} />
@@ -90,14 +132,66 @@ export default class Home extends Component {
                 <View style={styles.containerMain}>
                     {
                         !this.state.loading &&
-                        <ListaEntregas entrega={this.state.listaEntregas} />
+                        <ListaEntregas
+                            entrega={this.state.listaEntregas}
+                        />
                     }
                 </View>
+                <Modal
+                    transparent={true}
+                    animationType={'none'}
+                    visible={this.state.showModalFindOne}>
+                    <View style={styles.modalBackground}>
+                        <View style={[styles.modalContainer, { backgroundColor: this.state.status.background }]}>
+                            <TouchableHighlight
+                                onPress={this.closeModal}
+                                style={{ marginBottom: 20 }}>
+                                <Image style={styles.icoClose} source={require('../assets/closemodal.png')} />
+                            </TouchableHighlight>
+                            <View>
+                                {
+                                    (this.state.entrega.statusEntrega === 'EM_PREPARACAO' || this.state.entrega.statusEntrega === 'EM_ROTA') &&
+                                    <View style={[styles.entregaContainer]}>
+                                        <Text>cod. entrega: {this.state.entrega.id}</Text>
+                                        <Text>Status: {this.state.status.status}</Text>
+                                        <Text>Orgão solicitado: {this.state.entrega.doacao.orgao.tipoOrgao}</Text>
+                                        <Text>Previsão de entrega: {getPrevisao(this.state.entrega.previsaoEntrega)}</Text>
+                                        <Text>Paciente Destinatário: {this.state.entrega.doacao.receptor.nome}</Text>
+                                        <Text>Endereço de entrega: {
+                                            `${this.state.entrega.doacao.orgao.doador.hospital.nome} ${this.state.entrega.doacao.orgao.doador.hospital.logradouro} ${this.state.entrega.doacao.orgao.doador.hospital.cidade}`}</Text>
+                                        <Text>Endereço de destino: {
+                                            `${this.state.entrega.doacao.receptor.hospital.nome} ${this.state.entrega.doacao.receptor.hospital.logradouro} ${this.state.entrega.doacao.receptor.hospital.cidade}`} </Text>
+                                    </View>
+                                }
+                                {
+                                    this.state.entrega.statusEntrega === 'CANCELADO' &&
+                                    <View style={[styles.entregaContainer]}>
+                                        <Text>cod. entrega: {this.state.entrega.id}</Text>
+                                        <Text>Status: {this.state.status.status}</Text>
+                                        <Text>A entrega solcitada foi cancelada, em breve uma nova entrega será gerada para o endereço solicitado</Text>
+                                    </View>
+                                }
+                                {
+                                    this.state.entrega.statusEntrega === 'ENTREGUE' &&
+                                    <View style={[styles.entregaContainer]}>
+                                        <Text>cod. entrega: {this.state.entrega.id}</Text>
+                                        <Text>Orgão solicitado: {this.state.entrega.doacao.orgao.tipoOrgao}</Text>
+                                        <Text>Status: {this.state.status.status}</Text>
+                                        <Text>A entrega foi realizada com sucesso!</Text>
+                                        <Text>Nome do paciente: {this.state.entrega.doacao.receptor.nome}</Text>
+                                        <Text>Data entrega: {getPrevisao(this.state.entrega.dataHoraEntrega)}</Text>
+                                    </View>
+                                }
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
                 <Loader showModal={this.state.loading} />
+
             </View>
         )
     }
-    
+
 }
 
 
@@ -114,7 +208,7 @@ const styles = StyleSheet.create({
         height: 150,
     },
     containerMain: {
-        marginTop: 200, 
+        marginTop: 200,
         padding: 20
     },
     pesquisa: {
@@ -209,6 +303,23 @@ const styles = StyleSheet.create({
     icoBotao: {
         width: 25,
         height: 20
+    },
+    modalBackground: {
+        flex: 1,
+        alignItems: 'center',
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        backgroundColor: '#00000090'
+    },
+    modalContainer: {
+        height: 250,
+        width: 350,
+        borderRadius: 10,
+        padding: 20
+    },
+    icoClose: {
+        width: 15,
+        height: 15
     },
 })
 
